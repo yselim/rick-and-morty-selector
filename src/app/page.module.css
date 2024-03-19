@@ -8,6 +8,34 @@
 }
 
 
+.searchContainer{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+  border: solid red 1px;
+
+}
+
+.selectedNames{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+  border: solid red 1px;
+
+}
+
+.selectedNameBox{
+  border: solid blue 1px;
+  margin: 4px;
+}
+
+
 
 .selectorContainer{
   width: 500px;
