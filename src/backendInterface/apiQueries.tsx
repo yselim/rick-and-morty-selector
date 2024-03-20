@@ -12,7 +12,9 @@ export const fetchCharactersByName = async (name: string) => {
   try {
     const response = await fetch(`${API_URL}/character/?name=${name}`);
     const resp = await response.json();
-    characters = resp.results;
+
+    console.log('resp.results', resp.results)
+    characters = resp.results ?? [];
   } catch (e) {
     alert(
       "Something went wrong while fetching characters. (ERROR CODE: CHAR-919)"
@@ -20,6 +22,8 @@ export const fetchCharactersByName = async (name: string) => {
     characters = [];
     console.log(e);
   }
+
+  console.log('characters', characters)
 
   return characters;
 };
