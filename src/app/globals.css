@@ -38,7 +38,8 @@
   --callout-border-rgb: 172, 175, 176;
   --card-rgb: 180, 185, 188;
   --card-border-rgb: 131, 134, 135;
-  --line-color: rgb(74 74 74);
+  --searcher-text-color: rgb(74 74 74);
+  --line-color: #989595;
 }
 
 @media (prefers-color-scheme: dark) {
