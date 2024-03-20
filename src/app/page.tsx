@@ -128,7 +128,7 @@ export default function Home() {
   return (
     <main className={styles.main}>
       <div className={styles.center}>
-        <div className={styles.selectorContainer}>
+        <div className={styles.multiSelectContainer}>
           {searcher}
           {resultList}
         </div>

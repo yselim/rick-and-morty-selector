@@ -7,6 +7,10 @@
   min-height: 100vh;
 }
 
+.multiSelectContainer{
+  min-width: 200px;
+  max-width: 600px;
+}
 
 .searchContainer{
   display: flex;
@@ -33,9 +37,7 @@
   align-items: center;
 }
 
-.selectorContainer{
-  width: 600px;
-}
+
 
 .selectorInput{
   height: 40px;
