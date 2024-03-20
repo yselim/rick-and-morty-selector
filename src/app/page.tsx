@@ -5,25 +5,31 @@ import {
   Character,
 } from "@/backendInterface/apiQueries";
 import styles from "./page.module.css";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [characters, setCharacters] = useState<Character[]>([]);
-  const [selectedCharacters, setSelectedCharacters] = useState({}); // {id: selected_character}
+  const [selectedCharacters, setSelectedCharacters] = useState<{ [key: number]: Character }>({});
 
-  const onInputChange = async (e) => {
+  const debounceTimeoutId = useRef<NodeJS.Timeout | null>(null);
+  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
     setSearchTerm(term);
-    if (term.trim().length > 2) {
-      const res = await fetchCharactersByName(term.trim());
-      if (res.results) {
-        setCharacters(res.results);
-      } else {
-        setCharacters([]);
-      }
-    } else setCharacters([]);
+  
+    if (debounceTimeoutId.current) clearTimeout(debounceTimeoutId.current);
+  
+    debounceTimeoutId.current = setTimeout(async () => {
+      if (term.trim().length > 0) {
+        const res = await fetchCharactersByName(term.trim());
+        if (res.results) {
+          setCharacters(res.results);
+        } else {
+          setCharacters([]);
+        }
+      } else setCharacters([]);
+    }, 500);
   };
 
   const onCharacterChecked = (c: Character, isChecked: boolean) => {
@@ -36,7 +42,8 @@ export default function Home() {
 
   const searcher = (
     <div className={styles.searchContainer}>
-      {Object.keys(selectedCharacters).map((char_id) => {
+      {Object.keys(selectedCharacters).map((key) => {
+        const char_id = Number(key);
         return (
           <span key={char_id} className={styles.selectedNameBox}>
             {selectedCharacters[char_id].name}
@@ -91,7 +98,7 @@ export default function Home() {
               name={c.id.toString()}
               type="checkbox"
               className={styles.rowCheckBox}
-              checked={selectedCharacters[c.id] ?? false}
+              checked={!!selectedCharacters[c.id]}
               onChange={(e) => onCharacterChecked(c, e.target.checked)}
             />
             <Image
