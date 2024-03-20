@@ -1,18 +1,28 @@
 "use client";
 
-import {
-  fetchCharactersByName,
-  Character,
-} from "@/backendInterface/apiQueries";
 import styles from "./customMultiSelect.module.css";
 import { useState, useRef } from "react";
 import Image from "next/image";
 
-export default function CustomMultiSelect() {
+export interface MultiSelectItem {
+  id: number;
+  title: string;
+  imageUrl: string;
+  subTitle: string;
+}
+interface CustomMultiSelectProps {
+  searchFunction: (searchTerm: string) => Promise<MultiSelectItem[]>;
+  collectResultCallBack: (selectedIds: number[]) => void;
+}
+
+export default function CustomMultiSelect({
+  searchFunction,
+  collectResultCallBack,
+}: CustomMultiSelectProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [characters, setCharacters] = useState<Character[]>([]);
-  const [selectedCharacters, setSelectedCharacters] = useState<{
-    [key: number]: Character;
+  const [items, setItems] = useState<MultiSelectItem[]>([]);
+  const [selectedItems, setSelectedItems] = useState<{
+    [key: number]: MultiSelectItem;
   }>({});
 
   const debounceTimeoutId = useRef<NodeJS.Timeout | null>(null);
@@ -24,39 +34,36 @@ export default function CustomMultiSelect() {
 
     debounceTimeoutId.current = setTimeout(async () => {
       if (term.trim().length > 0) {
-        const res = await fetchCharactersByName(term.trim());
-        if (res.results) {
-          setCharacters(res.results);
-        } else {
-          setCharacters([]);
-        }
-      } else setCharacters([]);
+        const foundItems = await searchFunction(term.trim());
+        setItems(foundItems);
+      } else setItems([]);
     }, 500);
   };
 
-  const onCharacterChecked = (c: Character, isChecked: boolean) => {
-    let selectedChars = { ...selectedCharacters };
+  const onItemChecked = (c: MultiSelectItem, isChecked: boolean) => {
+    let selectedItemList = { ...selectedItems };
     if (isChecked) {
-      selectedChars[c.id] = c;
-    } else delete selectedChars[c.id];
-    setSelectedCharacters(selectedChars);
+      selectedItemList[c.id] = c;
+    } else delete selectedItemList[c.id];
+    setSelectedItems(selectedItemList);
+    collectResultCallBack(Object.keys(selectedItemList).map((k) => Number(k)));
   };
 
   const searcher = (
     <div className={styles.searchContainer}>
-      {Object.keys(selectedCharacters).map((key) => {
-        const char_id = Number(key);
+      {Object.keys(selectedItems).map((key) => {
+        const item_id = Number(key);
         return (
-          <span key={char_id} className={styles.selectedNameBox}>
-            {selectedCharacters[char_id].name}
+          <span key={item_id} className={styles.selectedNameBox}>
+            {selectedItems[item_id].title}
             <Image
               alt="close"
               src="/close_image.png"
               width={25}
               height={25}
-              style={{ margin: 5, cursor: "pointer"}}
+              style={{ margin: 5, cursor: "pointer" }}
               onClick={() => {
-                onCharacterChecked(selectedCharacters[char_id], false);
+                onItemChecked(selectedItems[item_id], false);
               }}
             />
           </span>
@@ -74,52 +81,47 @@ export default function CustomMultiSelect() {
   );
 
   const resultList = (
-    <div className={styles.characterTable}>
-      {characters.map((c) => {
+    <div className={styles.itemTable}>
+      {items.map((c) => {
         let trimmedSearchTerm = searchTerm.trim().toLocaleLowerCase();
-        let startIndexOfTheHighlight = c.name
+        let startIndexOfTheHighlight = c.title
           .toLowerCase()
           .indexOf(trimmedSearchTerm);
 
-        let characterNameFirstPart = c.name.substring(
-          0,
-          startIndexOfTheHighlight
-        );
-        let characterNameSecondPart = c.name.substring(
+        let titleFirstPart = c.title.substring(0, startIndexOfTheHighlight);
+        let titleSecondPart = c.title.substring(
           startIndexOfTheHighlight,
           startIndexOfTheHighlight + trimmedSearchTerm.length
         );
-        let characterNameLastPart = c.name.substring(
+        let titleLastPart = c.title.substring(
           startIndexOfTheHighlight + trimmedSearchTerm.length,
-          c.name.length
+          c.title.length
         );
 
         return (
-          <div className={styles.characterRow} key={c.id}>
+          <div className={styles.titleRow} key={c.id}>
             <input
               name={c.id.toString()}
               type="checkbox"
               className={styles.rowCheckBox}
-              checked={!!selectedCharacters[c.id]}
-              onChange={(e) => onCharacterChecked(c, e.target.checked)}
+              checked={!!selectedItems[c.id]}
+              onChange={(e) => onItemChecked(c, e.target.checked)}
             />
             <Image
-              src={c.image}
-              alt={c.name}
+              src={c.imageUrl}
+              alt={c.title}
               width={60}
               height={60}
-              className={styles.characterImage}
+              className={styles.itemImageStyle}
             />
 
-            <div className={styles.characterInfoContainer}>
-              <span className={styles.characterName}>
-                <span>{characterNameFirstPart}</span>
-                <strong>{characterNameSecondPart}</strong>
-                <span>{characterNameLastPart}</span>
+            <div className={styles.itemInfoContainer}>
+              <span className={styles.itemTitleStyle}>
+                <span>{titleFirstPart}</span>
+                <strong>{titleSecondPart}</strong>
+                <span>{titleLastPart}</span>
               </span>
-              <span className={styles.characterEpisode}>
-                {c.episode.length + " Episodes"}
-              </span>
+              <span className={styles.subTitleStyle}>{c.subTitle}</span>
             </div>
           </div>
         );

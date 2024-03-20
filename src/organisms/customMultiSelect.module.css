@@ -49,7 +49,7 @@
     outline: none;
   }
   
-  .characterTable{
+  .itemTable{
     border-radius: var(--border-radius);
     width: 100%;
     max-height: 700px;
@@ -60,7 +60,7 @@
   
   }
   
-  .characterRow{
+  .titleRow{
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
@@ -77,25 +77,25 @@
     margin: 10px;
   }
   
-  .characterImage{
+  .itemImageStyle{
     border-radius: var(--border-radius);
     margin-right: 10px;
   
   }
   
-  .characterInfoContainer{
+  .itemInfoContainer{
     display: flex;
     flex-direction: column;
   }
   
-  .characterName{
+  .itemTitleStyle{
     width: 100%;
     font-size: 20px;
     margin-bottom: 10px;
     color: var(--searcher-text-color);
   }
   
-  .characterEpisode{
+  .subTitleStyle{
     width: 100%;
     color:  var(--searcher-text-color);
   
