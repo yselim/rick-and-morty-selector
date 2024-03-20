@@ -36,25 +36,24 @@ export default function Home() {
 
   const searcher = (
     <div className={styles.searchContainer}>
-      <div className={styles.selectedNames}>
-        {Object.keys(selectedCharacters).map((char_id) => {
-          return (
-            <span key={char_id} className={styles.selectedNameBox}>
-              {selectedCharacters[char_id].name}
-              <Image
-                alt="close"
-                src="/close_image.png"
-                width={25}
-                height={25}
-                style={{ margin: 5 }}
-                onClick={() => {
-                  onCharacterChecked(selectedCharacters[char_id], false);
-                }}
-              />
-            </span>
-          );
-        })}
-      </div>
+      {Object.keys(selectedCharacters).map((char_id) => {
+        return (
+          <span key={char_id} className={styles.selectedNameBox}>
+            {selectedCharacters[char_id].name}
+            <Image
+              alt="close"
+              src="/close_image.png"
+              width={25}
+              height={25}
+              style={{ margin: 5 }}
+              onClick={() => {
+                onCharacterChecked(selectedCharacters[char_id], false);
+              }}
+            />
+          </span>
+        );
+      })}
+
       <input
         type="text"
         value={searchTerm}
