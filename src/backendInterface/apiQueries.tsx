@@ -25,5 +25,8 @@ export const fetchCharactersByName = async (name: string) => {
 
   console.log('characters', characters)
 
+  await delay(500); // I added this delay to simulate the delay of the API call, to show the loading spinner
   return characters;
 };
+
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
