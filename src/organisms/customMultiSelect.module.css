@@ -34,6 +34,10 @@
     white-space: nowrap;
     align-items: center;
   }
+
+  .highlightedSelectedNameBox{
+    border: solid red 2px;
+  }
   
   
   .selectorInput{
@@ -67,9 +71,15 @@
     align-items: center;
     width: 100%;
     height: 90px;
-    border-bottom: 1px solid var(--line-color); /* Add this line */
-    /* border: 1px solid var(--line-color);; */
-    /* border-collapse:separate; */
+    border-bottom: 1px solid var(--line-color);
+        
+  }
+  .titleRow:hover{
+    /* background-color: #96919269; */
+  }
+
+  .highlightedRow{
+    background-color: #96919269;
     
   }
   

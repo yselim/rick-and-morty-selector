@@ -24,6 +24,8 @@ export default function CustomMultiSelect({
   const [selectedItems, setSelectedItems] = useState<{
     [key: number]: MultiSelectItem;
   }>({});
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [highlightedTagIndex, setHighlightedTagIndex] = useState(-1);
 
   const debounceTimeoutId = useRef<NodeJS.Timeout | null>(null);
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,6 +39,7 @@ export default function CustomMultiSelect({
         const foundItems = await searchFunction(term.trim());
         setItems(foundItems);
       } else setItems([]);
+      setHighlightedIndex(-1);
     }, 500);
   };
 
@@ -51,10 +54,19 @@ export default function CustomMultiSelect({
 
   const searcher = (
     <div className={styles.searchContainer}>
-      {Object.keys(selectedItems).map((key) => {
+      {Object.keys(selectedItems).map((key, index) => {
         const item_id = Number(key);
         return (
-          <span key={item_id} className={styles.selectedNameBox}>
+          <span
+            key={item_id}
+            className={
+              styles.selectedNameBox +
+              " " +
+              (index === highlightedTagIndex
+                ? styles.highlightedSelectedNameBox
+                : "")
+            }
+          >
             {selectedItems[item_id].title}
             <Image
               alt="close"
@@ -82,7 +94,7 @@ export default function CustomMultiSelect({
 
   const resultList = (
     <div className={styles.itemTable}>
-      {items.map((c) => {
+      {items.map((c, index) => {
         let trimmedSearchTerm = searchTerm.trim().toLocaleLowerCase();
         let startIndexOfTheHighlight = c.title
           .toLowerCase()
@@ -98,8 +110,17 @@ export default function CustomMultiSelect({
           c.title.length
         );
 
+        let rowClassNames = styles.titleRow;
+        if (index === highlightedIndex) {
+          rowClassNames += ` ${styles.highlightedRow}`;
+        }
+
         return (
-          <div className={styles.titleRow} key={c.id}>
+          <div
+            className={rowClassNames}
+            key={c.id}
+            onClick={() => setHighlightedIndex(index)}
+          >
             <input
               name={c.id.toString()}
               type="checkbox"
@@ -131,7 +152,59 @@ export default function CustomMultiSelect({
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.multiSelectContainer}>
+      <div
+        className={styles.multiSelectContainer}
+        onKeyDown={(e) => {
+          if (
+            [
+              "Enter",
+              "Tab",
+              " ",
+              "ArrowDown",
+              "ArrowUp",
+              "ArrowRight",
+              "ArrowLeft",
+            ].includes(e.key)
+          )
+            e.preventDefault();
+          if (e.key === "ArrowDown") {
+            if (highlightedIndex < items.length - 1)
+              setHighlightedIndex(highlightedIndex + 1);
+            else setHighlightedIndex(0);
+
+
+            setHighlightedTagIndex(-1);
+            } else if (e.key === "ArrowUp") {
+            if (highlightedIndex > 0) setHighlightedIndex(highlightedIndex - 1);
+            else setHighlightedIndex(items.length - 1);
+
+            setHighlightedTagIndex(-1);
+
+          } else if (["Enter", "Tab", " "].includes(e.key)) {
+            // This is not working}){
+
+            if (highlightedIndex !== -1) {
+              let selectedItem = items[highlightedIndex];
+              onItemChecked(selectedItem, !selectedItems[selectedItem.id]);
+            }
+            else if(highlightedTagIndex !== -1){
+              let selectedItem = Object.values(selectedItems)[highlightedTagIndex];
+              onItemChecked(selectedItem, false);
+            }
+          } else if (e.key === "ArrowRight") {
+            if (highlightedTagIndex < Object.keys(selectedItems).length - 1)
+              setHighlightedTagIndex(highlightedTagIndex + 1);
+            else setHighlightedTagIndex(0);
+
+            setHighlightedIndex(-1);
+          } else if (e.key === "ArrowLeft") {
+            if (highlightedTagIndex > 0)
+              setHighlightedTagIndex(highlightedTagIndex - 1);
+            else setHighlightedTagIndex(Object.keys(selectedItems).length - 1);
+            setHighlightedIndex(-1);
+          }
+        }}
+      >
         {searcher}
         {resultList}
       </div>
